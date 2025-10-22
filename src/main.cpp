@@ -35,6 +35,8 @@ int main(int argc, const char *argv[]) {
     // For keeping track of time
     double start_time = SDL_GetTicksNS();
     const double target_time = 1000000000.0 / Constants::TARGET_FPS;
+    double total_frame_time = 0;
+    double total_frame_count = 0;
 
     HitboxApp::create();
 
@@ -60,8 +62,12 @@ int main(int argc, const char *argv[]) {
         const float between = SDL_GetTicksNS() - start_time;
         if (between < target_time)
             SDL_DelayNS(target_time - between);
+        total_frame_time += between;
+        total_frame_count += 1;
         start_time = SDL_GetTicksNS();
     }
+
+    spdlog::info("Average frame processing time: {:.2f}μs", (total_frame_time / total_frame_count) / 1000.0);
     
     spdlog::info("Cleaning up.");
     HitboxApp::cleanup();
