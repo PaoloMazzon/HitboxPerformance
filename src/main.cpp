@@ -32,6 +32,10 @@ int main(int argc, const char *argv[]) {
 
     renderer.setup(window, sdl_renderer);
 
+    // For keeping track of time
+    double start_time = SDL_GetTicksNS();
+    const double target_time = 1000000000.0 / Constants::TARGET_FPS;
+
     HitboxApp::create();
 
     bool keep_running = true;
@@ -44,12 +48,19 @@ int main(int argc, const char *argv[]) {
             }
         }
 
+        SDL_SetRenderDrawColor(renderer.get_renderer(), 0, 0, 0, 255);
         SDL_RenderClear(renderer.get_renderer());
 
         if (!HitboxApp::loop())
             keep_running = false;
 
         SDL_RenderPresent(renderer.get_renderer());
+
+        // Sleep for remaining time to maintain stable framerate
+        const float between = SDL_GetTicksNS() - start_time;
+        if (between < target_time)
+            SDL_DelayNS(target_time - between);
+        start_time = SDL_GetTicksNS();
     }
     
     spdlog::info("Cleaning up.");

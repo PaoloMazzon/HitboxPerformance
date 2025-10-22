@@ -14,6 +14,10 @@ public:
     float x2();
     float y1();
     float y2();
+    float w();
+    float h();
+
+    void move(float x, float y);
 
     bool collision(AABB& other);
 };
@@ -24,6 +28,7 @@ public:
     Hitbox(float x, float y, float w, float h) : m_bounding_box(x, y, w, h) {};
     AABB& bounding_box();
     bool bounding_box_collision(Hitbox& other);
+    void move(float x, float y);
 
     // Draw wireframe bounding box with a given colour
     void draw_bounding_box(SDL_Color& color);

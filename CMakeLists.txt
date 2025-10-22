@@ -8,5 +8,5 @@ add_subdirectory(extern/SDL EXCLUDE_FROM_ALL)
 add_subdirectory(extern/spdlog EXCLUDE_FROM_ALL)
 
 include_directories(${CMAKE_PROJECT_NAME} PRIVATE include)
-add_executable(${CMAKE_PROJECT_NAME} src/main.cpp src/RendererState.cpp src/App.cpp)
+add_executable(${CMAKE_PROJECT_NAME} src/main.cpp src/RendererState.cpp src/App.cpp src/Hitbox.cpp)
 target_link_libraries(${CMAKE_PROJECT_NAME} PRIVATE SDL3::SDL3 spdlog)
