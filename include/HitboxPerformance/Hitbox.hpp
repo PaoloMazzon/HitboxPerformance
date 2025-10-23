@@ -1,5 +1,6 @@
 #include <SDL3/SDL.h>
 #pragma once
+#include <array>
 
 class AABB {
     float m_x;
@@ -22,6 +23,10 @@ public:
     bool collision(AABB& other);
 };
 
+struct Vec2 {
+    float x, y;
+};
+
 class Hitbox {
     AABB m_bounding_box;
 public:
@@ -35,4 +40,20 @@ public:
 
     // Draw wireframe of the actual hitbox
     void draw_hitbox(SDL_Color& color);
+
+    std::array<Vec2, 4> get_vertices() { //fried my brain thinking about polygons, so I simplified it to rectangles like the AABB can change later
+        float x = m_bounding_box.x1();
+        float y = m_bounding_box.y1();
+        float w = m_bounding_box.w();
+        float h = m_bounding_box.h();
+
+        return {{
+            {x, y},         // top-left
+            {x + w, y},     // top-right
+            {x + w, y + h}, // bottom-right
+            {x, y + h}      // bottom-left - maybe double check these, should be in clockwise order
+        }};
+    }
+
+    bool sat_collision(Hitbox& other); //impl in Hitbox.cpp
 };

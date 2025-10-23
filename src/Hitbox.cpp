@@ -65,3 +65,51 @@ void Hitbox::draw_bounding_box(SDL_Color& color) {
 void Hitbox::draw_hitbox(SDL_Color& color) {
 
 }
+
+float dot(const Vec2& a, const Vec2& b) {
+    return a.x * b.x + a.y * b.y;
+}
+
+void project_polygon(const std::array<Vec2, 4>& vertices, const Vec2& axis, float& min, float& max) {
+    min = max = dot(vertices[0], axis);
+    for (int i = 1; i < vertices.size(); i++) {
+        float proj = dot(vertices[i], axis);
+        if (proj < min) min = proj;
+        if (proj > max) max = proj;
+    }
+}
+
+bool overlap_on_axis(const std::array<Vec2,4>& vertsA, const std::array<Vec2,4>& vertsB, const Vec2& axis) {
+    float minA, maxA, minB, maxB;
+    project_polygon(vertsA, axis, minA, maxA);
+    project_polygon(vertsB, axis, minB, maxB);
+    return !(maxA < minB || maxB < minA);
+}
+
+bool Hitbox::sat_collision(Hitbox& other) {
+    auto vertsA = get_vertices();
+    auto vertsB = other.get_vertices();
+
+    // For rectangle, only need edges of A and B
+    std::array<Vec2, 4> axes;
+
+    // edges of A
+    for (int i = 0; i < 4; i++) {
+        Vec2 edge = { vertsA[(i+1)%4].x - vertsA[i].x, vertsA[(i+1)%4].y - vertsA[i].y };
+        axes[i] = { -edge.y, edge.x }; // perpendicular
+    }
+
+    // check all axes
+    for (int i = 0; i < 4; i++) {
+        if (!overlap_on_axis(vertsA, vertsB, axes[i])) return false;
+    }
+
+    // edges of B
+    for (int i = 0; i < 4; i++) {
+        Vec2 edge = { vertsB[(i+1)%4].x - vertsB[i].x, vertsB[(i+1)%4].y - vertsB[i].y };
+        Vec2 axis = { -edge.y, edge.x }; // perpendicular
+        if (!overlap_on_axis(vertsA, vertsB, axis)) return false;
+    }
+
+    return true; // all axes overlapped therefore collision
+}
