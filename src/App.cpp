@@ -5,6 +5,7 @@
 #include "HitboxPerformance/RendererState.hpp"
 #include "HitboxPerformance/Constants.hpp"
 #include "HitboxPerformance/Hitbox.hpp"
+#include "HitboxPerformance/SpatialHashmap.hpp"
 
 enum class CollisionMode {
     AABB_ONLY,
@@ -22,7 +23,8 @@ struct Speed {
 
 std::vector<Hitbox> gHitboxes;
 std::vector<Speed> gHitboxesSpeeds;
-#define SCALE 4
+SpatialHashmap gSpace;
+#define SCALE 3
 std::vector<Vec2> POLYGON_1 = {
     {2 * SCALE, 2 * SCALE},
     {10 * SCALE, 4 * SCALE},
@@ -56,6 +58,7 @@ void HitboxApp::create() {
     std::uniform_int_distribution<> width(0, Constants::WINDOW_WIDTH - Constants::HITBOX_SIZE);
     std::uniform_int_distribution<> height(0, Constants::WINDOW_HEIGHT - Constants::HITBOX_SIZE);
     std::uniform_real_distribution<> speed(-Constants::MAX_SPEED, Constants::MAX_SPEED);
+    gSpace = SpatialHashmap(16, 12, 50, 50);
 
     // Randomly generate the hitboxes
     const std::vector<Vec2> polygons[] = {POLYGON_1, POLYGON_2, POLYGON_3};
@@ -92,6 +95,9 @@ bool HitboxApp::loop() {
             speed.y = -speed.y;
         hitbox.move(speed.x, speed.y);
     }
+
+    // Draw spatial hash map
+    gSpace.draw();
 
     // Draw all the hitboxes
     SDL_Color white = {.r = 255, .g = 255, .b = 255, .a = 255};
