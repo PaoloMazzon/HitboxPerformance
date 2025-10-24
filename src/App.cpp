@@ -134,8 +134,10 @@ bool HitboxApp::loop() {
             }
         }
 
-        hitbox.draw_bounding_box(colliding_bb ? red : white);
-        hitbox.draw_hitbox(colliding ? red : white);
+        if (gCollisionMode == CollisionMode::AABB_THEN_SAT || gCollisionMode == CollisionMode::AABB_ONLY)
+            hitbox.draw_bounding_box(colliding_bb ? red : white);
+        if (gCollisionMode == CollisionMode::AABB_THEN_SAT || gCollisionMode == CollisionMode::SAT_ONLY)
+            hitbox.draw_hitbox(colliding ? red : white);
     }
 
     return true;
