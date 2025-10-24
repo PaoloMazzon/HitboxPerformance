@@ -6,6 +6,14 @@
 #include "HitboxPerformance/Constants.hpp"
 #include "HitboxPerformance/Hitbox.hpp"
 
+enum class CollisionMode {
+    AABB_ONLY,
+    AABB_THEN_SAT,
+    SAT_ONLY
+};
+
+CollisionMode gCollisionMode = CollisionMode::AABB_THEN_SAT;
+
 // For moving hitboxes around
 struct Speed {
     float x;
@@ -48,6 +56,12 @@ bool HitboxApp::loop() {
         gHitboxes[0].move(mouse_delta_x, mouse_delta_y);
     }
 
+    // Read keyboard each frame
+    const bool* keyboard = SDL_GetKeyboardState(nullptr);
+    if (keyboard[SDL_SCANCODE_1]) gCollisionMode = CollisionMode::AABB_ONLY;
+    if (keyboard[SDL_SCANCODE_2]) gCollisionMode = CollisionMode::AABB_THEN_SAT;
+    if (keyboard[SDL_SCANCODE_3]) gCollisionMode = CollisionMode::SAT_ONLY;
+
     // Move all the hitboxes around
     for (int i = 1; i < gHitboxes.size(); i++) {
         Hitbox& hitbox = gHitboxes.at(i);
@@ -70,11 +84,32 @@ bool HitboxApp::loop() {
         bool colliding = false;
         for (auto& other: gHitboxes) {
             if (&other == &hitbox) continue;
-            if (other.bounding_box_collision(hitbox)) {
-                colliding_bb = true;
-            }
-            if (colliding_bb && other.sat_collision(hitbox)) {
-                colliding = true;
+
+            switch (gCollisionMode) {
+            case CollisionMode::AABB_ONLY:
+                if (other.bounding_box_collision(hitbox)) {
+                    colliding_bb = true;
+                    colliding = true;
+                    break;
+                }
+                break;
+
+            case CollisionMode::AABB_THEN_SAT:
+                if (other.bounding_box_collision(hitbox)) {
+                    colliding_bb = true;
+                    if (other.sat_collision(hitbox)) {
+                        colliding = true;
+                        break;
+                    }
+                }
+                break;
+
+            case CollisionMode::SAT_ONLY:
+                if (other.sat_collision(hitbox)) {
+                    colliding = true;
+                    colliding_bb = true;
+                    break;
+                }
                 break;
             }
         }
