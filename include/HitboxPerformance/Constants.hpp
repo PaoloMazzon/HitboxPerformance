@@ -8,5 +8,5 @@ namespace Constants {
     inline constexpr double TARGET_FPS = 60;
     inline constexpr float HITBOX_SIZE = 32;
     inline constexpr float MAX_SPEED = 3;
-    inline constexpr uint32_t HITBOX_COUNT = 10;
+    inline constexpr uint32_t HITBOX_COUNT = 20;
 }

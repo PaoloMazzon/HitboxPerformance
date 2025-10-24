@@ -16,10 +16,29 @@ std::vector<Hitbox> gHitboxes;
 std::vector<Speed> gHitboxesSpeeds;
 #define SCALE 4
 std::vector<Vec2> POLYGON_1 = {
-    {4 * SCALE, 4 * SCALE},
-    {20 * SCALE, 8 * SCALE},
-    {22 * SCALE, 26 * SCALE},
-    {6 * SCALE, 20 * SCALE}
+    {2 * SCALE, 2 * SCALE},
+    {10 * SCALE, 4 * SCALE},
+    {11 * SCALE, 13 * SCALE},
+    {3 * SCALE, 10 * SCALE}
+};
+
+std::vector<Vec2> POLYGON_2 = {
+        {1 * SCALE, 1 * SCALE},
+        {13 * SCALE, 2 * SCALE},
+        {15 * SCALE, 13 * SCALE},
+        {7 * SCALE, 14 * SCALE},
+        {1 * SCALE, 9 * SCALE}
+};
+
+std::vector<Vec2> POLYGON_3 = {
+        {10 * SCALE, 1 * SCALE},
+        {13 * SCALE, 4 * SCALE},
+        {14 * SCALE, 8 * SCALE},
+        {10 * SCALE, 14 * SCALE},
+        {5 * SCALE, 14 * SCALE},
+        {1 * SCALE, 8 * SCALE},
+        {2 * SCALE, 4 * SCALE},
+        {5 * SCALE, 1 * SCALE},
 };
 
 // Called once after the window and renderer are successfully initialized
@@ -31,8 +50,9 @@ void HitboxApp::create() {
     std::uniform_real_distribution<> speed(-Constants::MAX_SPEED, Constants::MAX_SPEED);
 
     // Randomly generate the hitboxes
+    const std::vector<Vec2> polygons[] = {POLYGON_1, POLYGON_2, POLYGON_3};
     for (int i = 0; i < Constants::HITBOX_COUNT; i++) {
-        gHitboxes.push_back(Hitbox(POLYGON_1));
+        gHitboxes.emplace_back(polygons[i % 3]);
         gHitboxesSpeeds.push_back((Speed){.x = static_cast<float>(speed(gen)), .y = static_cast<float>(speed(gen))});
     }
 }

@@ -62,8 +62,8 @@ void Hitbox::draw_bounding_box(SDL_Color& color) {
     SDL_FRect rect = {
         .x = m_bounding_box.x1(),
         .y = m_bounding_box.y1(),
-        .w = m_bounding_box.w(),
-        .h = m_bounding_box.h(),
+        .w = m_bounding_box.w() + 1,
+        .h = m_bounding_box.h() + 1,
     };
     SDL_SetRenderDrawColor(state.get_renderer(), color.r, color.g, color.b, color.a);
     SDL_RenderRect(state.get_renderer(), &rect);
