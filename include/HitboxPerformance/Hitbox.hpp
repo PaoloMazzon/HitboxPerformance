@@ -1,6 +1,6 @@
 #include <SDL3/SDL.h>
+#include <vector>
 #pragma once
-#include <array>
 
 class AABB {
     float m_x;
@@ -29,8 +29,25 @@ struct Vec2 {
 
 class Hitbox {
     AABB m_bounding_box;
+    std::vector<Vec2> m_vertices;
 public:
     Hitbox(float x, float y, float w, float h) : m_bounding_box(x, y, w, h) {};
+
+    // The point of this contructor is to find the min and max points for a bounding box
+    Hitbox(std::vector<Vec2> vertices) : m_vertices(vertices), m_bounding_box(0, 0, 0, 0) {
+        float x_max = 0;
+        float x_min = 999;
+        float y_max = 0;
+        float y_min = 999;
+        for (auto vertex: vertices) {
+            if (vertex.x < x_min) x_min = vertex.x;
+            if (vertex.x > x_max) x_max = vertex.x;
+            if (vertex.y < y_min) y_min = vertex.y;
+            if (vertex.y > y_max) y_max = vertex.y;
+        }
+        m_bounding_box = AABB(x_min, y_min, x_max - x_min, y_max - y_min);
+    };
+
     AABB& bounding_box();
     bool bounding_box_collision(Hitbox& other);
     void move(float x, float y);
@@ -41,19 +58,7 @@ public:
     // Draw wireframe of the actual hitbox
     void draw_hitbox(SDL_Color& color);
 
-    std::array<Vec2, 4> get_vertices() { //fried my brain thinking about polygons, so I simplified it to rectangles like the AABB can change later
-        float x = m_bounding_box.x1();
-        float y = m_bounding_box.y1();
-        float w = m_bounding_box.w();
-        float h = m_bounding_box.h();
+    std::vector<Vec2>& get_vertices();
 
-        return {{
-            {x, y},         // top-left
-            {x + w, y},     // top-right
-            {x + w, y + h}, // bottom-right
-            {x, y + h}      // bottom-left - maybe double check these, should be in clockwise order
-        }};
-    }
-
-    bool sat_collision(Hitbox& other); //impl in Hitbox.cpp
+    bool sat_collision(Hitbox& other);
 };

@@ -1,5 +1,6 @@
 #include <random>
 #include <vector>
+#include <SDL3/SDL.h>
 #include "HitboxPerformance/App.hpp"
 #include "HitboxPerformance/RendererState.hpp"
 #include "HitboxPerformance/Constants.hpp"
@@ -13,6 +14,13 @@ struct Speed {
 
 std::vector<Hitbox> gHitboxes;
 std::vector<Speed> gHitboxesSpeeds;
+#define SCALE 4
+std::vector<Vec2> POLYGON_1 = {
+    {4 * SCALE, 4 * SCALE},
+    {20 * SCALE, 8 * SCALE},
+    {22 * SCALE, 26 * SCALE},
+    {6 * SCALE, 20 * SCALE}
+};
 
 // Called once after the window and renderer are successfully initialized
 void HitboxApp::create() {
@@ -24,15 +32,24 @@ void HitboxApp::create() {
 
     // Randomly generate the hitboxes
     for (int i = 0; i < Constants::HITBOX_COUNT; i++) {
-        gHitboxes.push_back(Hitbox(width(gen), height(gen), Constants::HITBOX_SIZE, Constants::HITBOX_SIZE));
+        gHitboxes.push_back(Hitbox(POLYGON_1));
         gHitboxesSpeeds.push_back((Speed){.x = static_cast<float>(speed(gen)), .y = static_cast<float>(speed(gen))});
     }
 }
 
 // Called 1x each frame, return false to quit
 bool HitboxApp::loop() {
+    // Move around the first hitbox so user has some level of control
+    if (!gHitboxes.empty()) {
+        float x, y;
+        SDL_GetMouseState(&x, &y);
+        const float mouse_delta_x = x - gHitboxes[0].bounding_box().x1();
+        const float mouse_delta_y = y - gHitboxes[0].bounding_box().y1();
+        gHitboxes[0].move(mouse_delta_x, mouse_delta_y);
+    }
+
     // Move all the hitboxes around
-    for (int i = 0; i < gHitboxes.size(); i++) {
+    for (int i = 1; i < gHitboxes.size(); i++) {
         Hitbox& hitbox = gHitboxes.at(i);
         Speed& speed = gHitboxesSpeeds.at(i);
         if (hitbox.bounding_box().x1() < 0 || hitbox.bounding_box().x1() > Constants::WINDOW_WIDTH - hitbox.bounding_box().w())
@@ -49,16 +66,21 @@ bool HitboxApp::loop() {
     // Draw bounding boxes & eventually the actual hitbox
     for (auto& hitbox: gHitboxes) {
         // Check for collisions with other hitboxes
+        bool colliding_bb = false;
         bool colliding = false;
         for (auto& other: gHitboxes) {
             if (&other == &hitbox) continue;
             if (other.bounding_box_collision(hitbox)) {
+                colliding_bb = true;
+            }
+            if (colliding_bb && other.sat_collision(hitbox)) {
                 colliding = true;
                 break;
             }
         }
 
-        hitbox.draw_bounding_box(colliding ? red : white);
+        hitbox.draw_bounding_box(colliding_bb ? red : white);
+        hitbox.draw_hitbox(colliding ? red : white);
     }
 
     return true;
