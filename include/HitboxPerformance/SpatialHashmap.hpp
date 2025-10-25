@@ -34,7 +34,7 @@ public:
     std::vector<Hitbox*>& get_cell(int x, int y);
 
     // Returns a full list of all hitboxes in the spatial hashmap
-    std::vector<Hitbox>& get_hitboxes();
+    std::vector<Hitbox> *get_hitboxes();
 
     // Prompts the map to update the position of a hitbox in the grid
     void update_hitbox(int hitbox_index, bool remove_first = true);

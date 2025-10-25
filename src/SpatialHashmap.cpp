@@ -16,8 +16,8 @@ std::vector<Hitbox*>& SpatialHashmap::get_cell(int x, int y) {
     return m_grid.at((y * m_grid_width) + x);
 }
 
-std::vector<Hitbox>& SpatialHashmap::get_hitboxes() {
-    return m_hitboxes;
+std::vector<Hitbox> *SpatialHashmap::get_hitboxes() {
+    return &m_hitboxes;
 }
 
 void SpatialHashmap::update_hitbox(int hitbox_index, bool remove_first) {
@@ -39,7 +39,8 @@ void SpatialHashmap::update_hitbox(int hitbox_index, bool remove_first) {
         if (remove_first) {
             for (int i = 0; i < previous_cell.size(); i++) {
                 if (&m_hitboxes[hitbox_index] == previous_cell[i]) {
-                    previous_cell.erase(previous_cell.begin() + i);
+                    previous_cell[i] = previous_cell.back();
+                    previous_cell.pop_back();
                     break;
                 }
             }
