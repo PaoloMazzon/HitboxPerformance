@@ -2,7 +2,6 @@
 #include <vector>
 #include <SDL3/SDL.h>
 #include "HitboxPerformance/App.hpp"
-#include "HitboxPerformance/RendererState.hpp"
 #include "HitboxPerformance/Constants.hpp"
 #include "HitboxPerformance/Hitbox.hpp"
 #include "HitboxPerformance/SpatialHashmap.hpp"
@@ -66,6 +65,14 @@ void HitboxApp::create() {
         gSpace.add_hitbox(Hitbox(polygons[i % 3]));
         gHitboxesSpeeds.push_back((Speed){.x = static_cast<float>(speed(gen)), .y = static_cast<float>(speed(gen))});
     }
+
+    // Move all the hitboxes around
+    auto hitbox_list = gSpace.get_hitboxes();
+    for (int i = 1; i < hitbox_list->size(); i++) {
+        Hitbox& hitbox = hitbox_list->at(i);
+        hitbox.move(width(gen), height(gen));
+        gSpace.update_hitbox(i);
+    }
 }
 
 void collision(Hitbox *h1, Hitbox *h2, bool *bb_collision, bool *collision) {
@@ -117,6 +124,8 @@ bool HitboxApp::loop() {
     if (keyboard[SDL_SCANCODE_1]) gCollisionMode = CollisionMode::AABB_ONLY;
     if (keyboard[SDL_SCANCODE_2]) gCollisionMode = CollisionMode::AABB_THEN_SAT;
     if (keyboard[SDL_SCANCODE_3]) gCollisionMode = CollisionMode::SAT_ONLY;
+    if (keyboard[SDL_SCANCODE_4]) gEnableSpatialCollisions = true;
+    if (keyboard[SDL_SCANCODE_5]) gEnableSpatialCollisions = false;
 
     // Move all the hitboxes around
     for (int i = 1; i < hitbox_list->size(); i++) {
