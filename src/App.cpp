@@ -93,6 +93,8 @@ bool HitboxApp::loop() {
         hitbox.move(speed.x, speed.y);
     }
 
+    Uint64 collision_start = SDL_GetTicksNS(); //unsigned 64bit int
+
     // Draw all the hitboxes
     SDL_Color white = {.r = 255, .g = 255, .b = 255, .a = 255};
     SDL_Color red = {.r = 217, .g = 65, .b = 54, .a = 255};
@@ -138,6 +140,21 @@ bool HitboxApp::loop() {
             hitbox.draw_bounding_box(colliding_bb ? red : white);
         if (gCollisionMode == CollisionMode::AABB_THEN_SAT || gCollisionMode == CollisionMode::SAT_ONLY)
             hitbox.draw_hitbox(colliding ? red : white);
+
+        Uint64 collision_elapsed = SDL_GetTicksNS() - collision_start;
+        double collision_us = collision_elapsed / 1000; // nano to micro
+
+        // update window title once per frame
+        std::string mode_string;
+        switch (gCollisionMode) {
+        case CollisionMode::AABB_ONLY: mode_string = "AABB Only"; break;
+        case CollisionMode::AABB_THEN_SAT: mode_string = "AABB then SAT"; break;
+        case CollisionMode::SAT_ONLY: mode_string = "SAT Only"; break;
+        }
+        std::string title = "Hitbox Performance - (Use Keys 1-3 to swap mode) Mode: " + mode_string +
+                            " | Collision: " + std::to_string(collision_us) + " μs";
+        SDL_SetWindowTitle(RendererState::instance().get_window(), title.c_str());
+
     }
 
     return true;
