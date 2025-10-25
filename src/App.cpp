@@ -14,7 +14,7 @@ enum class CollisionMode {
 };
 
 CollisionMode gCollisionMode = CollisionMode::AABB_THEN_SAT;
-bool gEnableSpatialCollisions = false;
+bool gEnableSpatialCollisions = true;
 
 // For moving hitboxes around
 struct Speed {
@@ -65,6 +65,14 @@ void HitboxApp::create() {
     for (int i = 0; i < Constants::HITBOX_COUNT; i++) {
         gSpace.add_hitbox(Hitbox(polygons[i % 3]));
         gHitboxesSpeeds.push_back((Speed){.x = static_cast<float>(speed(gen)), .y = static_cast<float>(speed(gen))});
+    }
+
+    // Move all the hitboxes around
+    auto hitbox_list = gSpace.get_hitboxes();
+    for (int i = 1; i < hitbox_list->size(); i++) {
+        Hitbox& hitbox = hitbox_list->at(i);
+        hitbox.move(width(gen), height(gen));
+        gSpace.update_hitbox(i);
     }
 }
 
