@@ -2,7 +2,6 @@
 #include <vector>
 #include <SDL3/SDL.h>
 #include "HitboxPerformance/App.hpp"
-#include "HitboxPerformance/RendererState.hpp"
 #include "HitboxPerformance/Constants.hpp"
 #include "HitboxPerformance/Hitbox.hpp"
 #include "HitboxPerformance/SpatialHashmap.hpp"
@@ -14,7 +13,7 @@ enum class CollisionMode {
 };
 
 CollisionMode gCollisionMode = CollisionMode::AABB_THEN_SAT;
-bool gEnableSpatialCollisions = true;
+bool gEnableSpatialCollisions = false;
 
 // For moving hitboxes around
 struct Speed {
@@ -125,6 +124,8 @@ bool HitboxApp::loop() {
     if (keyboard[SDL_SCANCODE_1]) gCollisionMode = CollisionMode::AABB_ONLY;
     if (keyboard[SDL_SCANCODE_2]) gCollisionMode = CollisionMode::AABB_THEN_SAT;
     if (keyboard[SDL_SCANCODE_3]) gCollisionMode = CollisionMode::SAT_ONLY;
+    if (keyboard[SDL_SCANCODE_4]) gEnableSpatialCollisions = true;
+    if (keyboard[SDL_SCANCODE_5]) gEnableSpatialCollisions = false;
 
     // Move all the hitboxes around
     for (int i = 1; i < hitbox_list->size(); i++) {
