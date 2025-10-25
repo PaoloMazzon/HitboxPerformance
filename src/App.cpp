@@ -5,6 +5,7 @@
 #include "HitboxPerformance/Constants.hpp"
 #include "HitboxPerformance/Hitbox.hpp"
 #include "HitboxPerformance/SpatialHashmap.hpp"
+#include "HitboxPerformance/RendererState.hpp"
 
 enum class CollisionMode {
     AABB_ONLY,
@@ -193,7 +194,7 @@ bool HitboxApp::loop() {
     case CollisionMode::AABB_THEN_SAT: mode_string = "AABB then SAT"; break;
     case CollisionMode::SAT_ONLY: mode_string = "SAT Only"; break;
     }
-    std::string title = "Hitbox Performance - (Use Keys 1-3 to swap mode) Mode: " + mode_string +
+    std::string title = "Hitbox Performance - (Keys 1-3: Change mode, 4-5: toggle hash map) Mode: " + mode_string +
                         " | Collision: " + std::to_string(collision_us) + " μs";
     SDL_SetWindowTitle(RendererState::instance().get_window(), title.c_str());
 
